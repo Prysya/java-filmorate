@@ -14,6 +14,10 @@ import java.time.LocalDate;
 @Data
 public class Film {
     /**
+     * Уникальный идентификатор
+     */
+    private Integer id = null;
+    /**
      * Название
      */
     @NotNull(message = FilmErrorMessages.name)
@@ -36,8 +40,4 @@ public class Film {
     @NotNull(message = FilmErrorMessages.duration)
     @Min(value = 1, message = FilmErrorMessages.duration)
     private final Integer duration;
-    /**
-     * Уникальный идентификатор
-     */
-    Integer id = null;
 }
