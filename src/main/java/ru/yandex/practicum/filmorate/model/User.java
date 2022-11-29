@@ -24,24 +24,17 @@ public class User {
      * Электронная почта
      */
     @NotBlank(message = UserErrorMessages.email)
-    @Email(message = UserErrorMessages.email)
-    final String email;
+    @Email(message = UserErrorMessages.email, regexp = RegexPatterns.EMAIL)
+    private final String email;
     /**
      * Логин пользователя
      */
-    @Pattern(regexp = "^[\\S]+$", message = UserErrorMessages.login)
-    final String login;
+    @NotBlank(message = UserErrorMessages.login)
+    @Pattern(regexp = RegexPatterns.WITHOUT_WHITE_SPACES, message = UserErrorMessages.login)
+    private final String login;
     /**
      * Дата рождения
      */
-    @Past(message = UserErrorMessages.birthday)
-    final LocalDate birthday;
-    /**
-     * Уникальный идентификатор
-     */
-    Integer id = null;
-    /**
-     * Имя для отображения
-     */
-    String name;
+    @PastOrPresent(message = UserErrorMessages.birthday)
+    private final LocalDate birthday;
 }
