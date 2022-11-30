@@ -14,6 +14,11 @@ import java.time.LocalDate;
 @Data
 public class Film {
     /**
+     * Константа с максимальной длинной описания
+     */
+    public static final int MAX_DESCRIPTION_SIZE = 200;
+
+    /**
      * Уникальный идентификатор
      */
     private Integer id = null;
@@ -26,7 +31,7 @@ public class Film {
     /**
      * Описание
      */
-    @Size(max = 200, message = FilmErrorMessages.description)
+    @Size(max = MAX_DESCRIPTION_SIZE, message = FilmErrorMessages.description)
     private final String description;
     /**
      * Дата релиза
