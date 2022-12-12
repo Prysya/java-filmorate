@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.constants.FilmErrorMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-    final FilmStorage inMemoryFilmStorage;
-    final UserStorage inMemoryUserStorage;
+    private final FilmStorage inMemoryFilmStorage;
+    private final UserStorage inMemoryUserStorage;
 
     @Autowired
     public FilmService(FilmStorage inMemoryFilmStorage, UserStorage inMemoryUserStorage) {

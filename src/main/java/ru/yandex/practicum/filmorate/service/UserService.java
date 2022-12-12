@@ -2,17 +2,19 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.constants.UserErrorMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
-    final UserStorage inMemoryUserStorage;
+    private final UserStorage inMemoryUserStorage;
 
     @Autowired
     public UserService(InMemoryUserStorage inMemoryUserStorage) {
@@ -28,13 +30,7 @@ public class UserService {
     }
 
     public User update(User user) throws NotFoundException {
-        User newUser = inMemoryUserStorage.update(user);
-
-        if (Objects.isNull(newUser)) {
-            throw new NotFoundException(UserErrorMessages.notFound);
-        }
-
-        return newUser;
+        return inMemoryUserStorage.update(user);
     }
 
     public User getById(Long id) throws NotFoundException {
