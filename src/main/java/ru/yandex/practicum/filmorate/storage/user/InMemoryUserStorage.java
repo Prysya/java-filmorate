@@ -1,10 +1,11 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.constants.UserErrorMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.utils.NullValidator;
 
 import java.util.*;
 
@@ -15,7 +16,7 @@ public class InMemoryUserStorage implements UserStorage {
     /**
      * Мапа пользователей по уникальному идентификатору
      */
-    final Map<Long, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
 
     @Override
     public User get(Long id) throws NotFoundException {
@@ -29,6 +30,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User add(User user) {
+        NullValidator.validate(user, UserErrorMessages.badRequest);
         checkAndUpdateName(user);
 
         user.setId((long) (users.size() + 1));
@@ -46,6 +48,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User update(User user) throws NotFoundException {
+        NullValidator.validate(user, UserErrorMessages.badRequest);
         boolean hasId = Objects.nonNull(user.getId());
 
         if (hasId) {
@@ -66,7 +69,7 @@ public class InMemoryUserStorage implements UserStorage {
         return add(user);
     }
 
-    public void checkAndUpdateName(User user) {
+    private void checkAndUpdateName(User user) {
         if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
