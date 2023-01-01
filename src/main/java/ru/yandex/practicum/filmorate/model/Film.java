@@ -50,4 +50,13 @@ public class Film {
      * Список уникальных идентификаторов пользователей которые поставили лайк
      */
     private Set<Long> likes = new HashSet<>();
+    /**
+     * Список жанров
+     */
+    private Set<String> genre = new HashSet<>();
+    /**
+     * Рейтинг Ассоциации кинокомпаний
+     */
+    @NotNull(message = FilmErrorMessages.mpaIsEmpty)
+    private String mpaRating;
 }

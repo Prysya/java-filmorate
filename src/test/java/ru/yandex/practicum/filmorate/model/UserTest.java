@@ -7,15 +7,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
