@@ -10,4 +10,5 @@ public class FilmErrorMessages {
     public static final String duration = "Продолжительность фильма должна быть положительной";
     public static final String notFound = "Фильм не найден";
     public static final String badRequest = "Ошибка валидации полей фильма";
+    public static final String mpaIsEmpty = "Рейтинг ассоциации конокомпаний не может быть пустым";
 }
