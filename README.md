@@ -1,2 +1,1 @@
-# java-filmorate
-Template repository for Filmorate project.
+![Schema image](./assets/images/schema.png)
