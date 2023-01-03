@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.annotation.validator.ReleaseDateValidation;
-import ru.yandex.practicum.filmorate.constants.FilmErrorMessages;
+import ru.yandex.practicum.filmorate.constant.FilmErrorMessages;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;

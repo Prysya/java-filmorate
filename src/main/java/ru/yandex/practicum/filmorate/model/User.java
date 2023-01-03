@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import ru.yandex.practicum.filmorate.constants.UserErrorMessages;
+import ru.yandex.practicum.filmorate.constant.UserErrorMessages;
 import ru.yandex.practicum.filmorate.utils.RegexPatterns;
 
 import javax.validation.constraints.Email;
