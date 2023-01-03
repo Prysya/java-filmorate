@@ -12,7 +12,7 @@
 
 ```sql
 SELECT *
-FROM user;
+FROM users;
 ```
 
 | user\_id | email            | login   | name      | birthday   |
@@ -25,7 +25,7 @@ FROM user;
 
 ```sql
 SELECT *
-FROM film;
+FROM films;
 ```
 
 | film\_id | name           | description                                                                                                                      | release\_date | duration | mpa\_rating\_id |
@@ -72,7 +72,7 @@ FROM genres;
 ```sql
 SELECT f.name as film_name,
        g.name as genre
-FROM film f
+FROM films f
          JOIN genres as gs ON f.film_id = gs.film_id
          JOIN genre as g ON gs.genre_id = g.genre_id;
 ```
@@ -86,7 +86,7 @@ FROM film f
 ```sql
 SELECT f.name as film_name,
        g.name as genre
-FROM film f
+FROM films as f
          LEFT JOIN genres as gs ON f.film_id = gs.film_id
          LEFT JOIN genre as g ON gs.genre_id = g.genre_id;
 ```
@@ -102,8 +102,8 @@ FROM film f
 
 ```sql
 SELECT *
-FROM user
-         LEFT JOIN friendship_status as fs ON user.user_id = fs.friend_id;
+FROM users
+         LEFT JOIN friendship_status as fs ON users.user_id = fs.friend_id;
 ```
 
 | user\_id | email            | login     | name      | birthday   | friendship\_id | user\_id | friend\_id | is\_confirm |
@@ -119,9 +119,9 @@ FROM user
 
 ```sql
 SELECT *
-FROM user
+FROM users
 WHERE user_id IN (SELECT f.friend_id
-                  FROM user as u
+                  FROM users as u
                            JOIN friendship_status as fs ON u.user_id = fs.user_id
                   WHERE u.user_id = 3);
 ```
