@@ -1,55 +1,60 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.constants.FilmErrorMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    /**
-     * Мапа фильмов
-     */
-    final Map<Integer, Film> films = new HashMap<>();
+
+    private final FilmService filmService;
+
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping
     public List<Film> getAll() {
-        return new ArrayList<>(films.values());
+        return filmService.getAll();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        film.setId(films.size() + 1);
-        films.put(film.getId(), film);
-
-        log.debug("Создан новый фильм: {}", film);
-
-        return film;
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) throws NotFoundException {
-        boolean hasId = Objects.nonNull(film.getId());
+        return filmService.update(film);
+    }
 
-        if (hasId) {
-            if (films.containsKey(film.getId())) {
-                films.put(film.getId(), film);
+    @GetMapping("/{filmId}")
+    public Film getById(@PathVariable Long filmId) throws NotFoundException {
+        return filmService.getById(filmId);
+    }
 
-                log.debug("Обновлен фильм с id({}): {}", film.getId(), film);
+    @PutMapping("/{filmId}/like/{userId}")
+    public void likeFilm(@PathVariable Long filmId, @PathVariable Long userId) throws NotFoundException {
+        filmService.addLike(filmId, userId);
+    }
 
-                return film;
-            }
+    @DeleteMapping("/{filmId}/like/{userId}")
+    public void dislikeFilm(@PathVariable Long filmId, @PathVariable Long userId) throws NotFoundException {
+        filmService.deleteLike(filmId, userId);
+    }
 
-            throw new NotFoundException(FilmErrorMessages.notFound);
-        }
-
-
-        return create(film);
+    @GetMapping("/popular")
+    public List<Film> getById(@RequestParam(required = false) Optional<Integer> count) {
+        return filmService.getMostLiked(count);
     }
 }

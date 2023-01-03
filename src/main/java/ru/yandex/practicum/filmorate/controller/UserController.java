@@ -1,56 +1,63 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.constants.UserErrorMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public List<User> getAll() {
-        return new ArrayList<>(users.values());
+        return userService.getAll();
     }
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        UserService.checkAndUpdateName(user);
-
-        user.setId(users.size() + 1);
-        users.put(user.getId(), user);
-
-        log.debug("Создан новый пользователь: {}", user);
-
-        return user;
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User user) throws NotFoundException {
-        boolean hasId = Objects.nonNull(user.getId());
+        return userService.update(user);
+    }
 
-        if (hasId) {
-            if (users.containsKey(user.getId())) {
-                UserService.checkAndUpdateName(user);
-                users.put(user.getId(), user);
+    @GetMapping("/{userId}")
+    public User getById(@PathVariable Long userId) throws NotFoundException {
+        return userService.getById(userId);
+    }
 
-                log.debug("Обновлен пользователь с id({}): {}", user.getId(), user);
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addFriend(@PathVariable Long userId, @PathVariable Long friendId) throws NotFoundException {
+        userService.addFriend(userId, friendId);
+    }
 
-                return user;
-            }
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Long userId, @PathVariable Long friendId) throws NotFoundException {
+        userService.deleteFriend(userId, friendId);
+    }
 
-            throw new NotFoundException(UserErrorMessages.notFound);
-        }
+    @GetMapping("/{userId}/friends")
+    public List<User> getfriends(@PathVariable Long userId) throws NotFoundException {
+        return userService.getFriends(userId);
+    }
 
-
-        return create(user);
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable Long userId, @PathVariable Long otherId) throws NotFoundException {
+        return userService.getMutualFriends(userId, otherId);
     }
 }

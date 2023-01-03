@@ -10,6 +10,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -17,11 +19,6 @@ public class Film {
      * Константа с максимальной длинной описания
      */
     public static final int MAX_DESCRIPTION_SIZE = 200;
-
-    /**
-     * Уникальный идентификатор
-     */
-    private Integer id = null;
     /**
      * Название
      */
@@ -45,4 +42,12 @@ public class Film {
     @NotNull(message = FilmErrorMessages.duration)
     @Min(value = 1, message = FilmErrorMessages.duration)
     private final Integer duration;
+    /**
+     * Уникальный идентификатор
+     */
+    private Long id = null;
+    /**
+     * Список уникальных идентификаторов пользователей которые поставили лайк
+     */
+    private Set<Long> likes = new HashSet<>();
 }
