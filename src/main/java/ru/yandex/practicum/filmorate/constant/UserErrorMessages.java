@@ -9,4 +9,5 @@ public class UserErrorMessages {
     public static final String birthday = "Дата рождения не может быть в будущем";
     public static final String notFound = "Пользователь не найден";
     public static final String badRequest = "Ошибка валидации полей пользователя";
+    public static final String notUniqeEmail = "Email уже зарегистрирован";
 }
