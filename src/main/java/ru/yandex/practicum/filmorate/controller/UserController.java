@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -27,7 +29,8 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public User create(@Valid @RequestBody User user) throws BadRequestException {
         return userService.create(user);
     }
 
