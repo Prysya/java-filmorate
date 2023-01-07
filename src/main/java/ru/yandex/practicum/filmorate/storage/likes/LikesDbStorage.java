@@ -55,7 +55,7 @@ public class LikesDbStorage implements LikesStorage {
         String sqlQuery = "SELECT F.* " +
             "FROM FILMS AS F " +
             "LEFT JOIN LIKES L on F.FILM_ID = L.FILM_ID " +
-            "GROUP BY F.NAME " +
+            "GROUP BY F.FILM_ID, F.NAME " +
             "ORDER BY COUNT(L.USER_ID) DESC " +
             "LIMIT ?";
 
