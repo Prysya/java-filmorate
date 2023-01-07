@@ -10,6 +10,7 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,107 +19,183 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
+    private Film.FilmBuilder createBasicFilmBuilder() {
+        return Film.builder()
+            .name("name")
+            .duration(1)
+            .releaseDate(LocalDate.of(2000, Month.OCTOBER, 10))
+            .genres(new ArrayList<>())
+            .mpa(Mpa.builder().id(1L).build());
+    }
+
     @Test
     void shouldNotValidateIfNameIsNull() {
-        Film film = new Film(null, "", LocalDate.of(2000, Month.OCTOBER, 10), 1);
+        Film film = createBasicFilmBuilder()
+            .name(null)
+            .build();
 
         assertFalse(validator.validate(film).isEmpty());
     }
 
     @Test
     void shouldNotValidateIfNameIsBlank() {
-        Film film = new Film("", "", LocalDate.of(2000, Month.OCTOBER, 10), 1);
+        Film film = createBasicFilmBuilder()
+            .name("")
+            .build();
 
         assertFalse(validator.validate(film).isEmpty());
     }
 
     @Test
     void shouldCreateUserWithFilledName() {
-        Film film = new Film("Name", "", LocalDate.of(2000, Month.OCTOBER, 10), 1);
+        Film film = createBasicFilmBuilder()
+            .name("Name")
+            .build();
 
         assertTrue(validator.validate(film).isEmpty());
     }
 
     @Test
     void shouldNotValidateIfDescriptionLengthIs201() {
-        Film film = new Film(
-                "Name",
-                " ".repeat(Film.MAX_DESCRIPTION_SIZE + 1),
-                LocalDate.of(2000, Month.OCTOBER, 10),
-                1
-        );
+        Film film = createBasicFilmBuilder()
+            .description(" ".repeat(Film.MAX_DESCRIPTION_SIZE + 1))
+            .build();
 
         assertFalse(validator.validate(film).isEmpty());
     }
 
     @Test
     void shouldCreateFilmIfDescriptionLengthLowerOrEquals_MAX_DESCRIPTION_SIZE() {
-        assertTrue(validator.validate(new Film(
-                "Name",
-                " ".repeat(Film.MAX_DESCRIPTION_SIZE),
-                LocalDate.of(2000, Month.OCTOBER, 10),
-                1
-        )).isEmpty());
-        assertTrue(validator.validate(new Film(
-                "Name",
-                " ".repeat(Film.MAX_DESCRIPTION_SIZE - 1),
-                LocalDate.of(2000, Month.OCTOBER, 10),
-                1
-        )).isEmpty());
-        assertTrue(validator.validate(new Film("Name", " ", LocalDate.of(2000, Month.OCTOBER, 10), 1)).isEmpty());
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .description(" ".repeat(Film.MAX_DESCRIPTION_SIZE))
+                .build()
+        ).isEmpty());
+
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .description(" ".repeat(Film.MAX_DESCRIPTION_SIZE - 1))
+                .build()
+        ).isEmpty());
+
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .description(" ")
+                .build()
+        ).isEmpty());
     }
 
     @Test
     void shouldCreateFilmIfDescriptionIsNullOrBlank() {
-        Film film = new Film("Name", null, LocalDate.of(2000, Month.OCTOBER, 10), 1);
-        assertTrue(validator.validate(film).isEmpty());
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .description(null)
+                .build()
+        ).isEmpty());
 
-        Film film1 = new Film("Name", "", LocalDate.of(2000, Month.OCTOBER, 10), 1);
-        assertTrue(validator.validate(film1).isEmpty());
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .description("")
+                .build()
+        ).isEmpty());
     }
 
     @Test
     void shouldNotValidateIfReleaseDateIsBeforeThen_28_12_1895() {
-        assertFalse(validator.validate(new Film("Name", "", LocalDate.of(1895, Month.DECEMBER, 27), 1)).isEmpty());
-        assertFalse(validator.validate(new Film("Name", "", LocalDate.of(1894, Month.DECEMBER, 28), 1)).isEmpty());
+        assertFalse(validator.validate(
+            createBasicFilmBuilder()
+                .releaseDate(LocalDate.of(1895, Month.DECEMBER, 27))
+                .build()
+        ).isEmpty());
+
+        assertFalse(validator.validate(
+            createBasicFilmBuilder()
+                .releaseDate(LocalDate.of(1894, Month.DECEMBER, 28))
+                .build()
+        ).isEmpty());
     }
 
     @Test
     void shouldNotValidateIfReleaseDateIsNull() {
-        assertThrows(ValidationException.class, () -> {
-            Film film = new Film("Name", "", null, 1);
-            assertFalse(validator.validate(film).isEmpty());
-        });
+        assertThrows(ValidationException.class, () -> assertFalse(validator.validate(
+            createBasicFilmBuilder()
+                .releaseDate(null)
+                .build()
+        ).isEmpty()));
     }
 
     @Test
-    void shouldCreateFilmIfDescriptionIsLaterOrEquals_28_12_1895() {
-        assertTrue(validator.validate(new Film("Name", "", LocalDate.of(1895, Month.DECEMBER, 29), 1)).isEmpty());
-        assertTrue(validator.validate(new Film("Name", "", LocalDate.of(1895, Month.DECEMBER, 28), 1)).isEmpty());
-        assertTrue(validator.validate(new Film("Name", "", LocalDate.of(2000, Month.OCTOBER, 10), 1)).isEmpty());
+    void shouldCreateFilmIfReleaseDateIsLaterOrEquals_28_12_1895() {
+        Film film = createBasicFilmBuilder()
+            .releaseDate(LocalDate.of(1895, Month.DECEMBER, 29))
+            .build();
+
+        System.out.println(film);
+
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .releaseDate(LocalDate.of(1895, Month.DECEMBER, 29))
+                .build()
+        ).isEmpty());
+
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .releaseDate(LocalDate.of(1895, Month.DECEMBER, 28))
+                .build()
+        ).isEmpty());
+
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .releaseDate(LocalDate.of(2000, Month.OCTOBER, 10))
+                .build()
+        ).isEmpty());
     }
 
     @Test
     void shouldNotValidateIfDurationIsNull() {
-        Film film = new Film("Name", "", LocalDate.of(2000, Month.DECEMBER, 28), null);
-        assertFalse(validator.validate(film).isEmpty());
+        assertFalse(validator.validate(
+            createBasicFilmBuilder()
+                .duration(null)
+                .build()
+        ).isEmpty());
     }
 
     @Test
     void shouldNotValidateIfDurationIsZeroOrLower() {
-        Film film = new Film("Name", "", LocalDate.of(2000, Month.DECEMBER, 28), 0);
-        assertFalse(validator.validate(film).isEmpty());
+        assertFalse(validator.validate(
+            createBasicFilmBuilder()
+                .duration(0)
+                .build()
+        ).isEmpty());
 
-        Film film1 = new Film("Name", "", LocalDate.of(2000, Month.DECEMBER, 28), -1);
-        assertFalse(validator.validate(film1).isEmpty());
+        assertFalse(validator.validate(
+            createBasicFilmBuilder()
+                .duration(-1)
+                .build()
+        ).isEmpty());
     }
 
     @Test
     void shouldCreateFilmIfDurationIsOneOrHigher() {
-        Film film = new Film("Name", "", LocalDate.of(1895, Month.DECEMBER, 29), 1);
-        assertTrue(validator.validate(film).isEmpty());
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .duration(1)
+                .build()
+        ).isEmpty());
 
-        Film film1 = new Film("Name", "", LocalDate.of(2000, Month.OCTOBER, 10), 100);
-        assertTrue(validator.validate(film1).isEmpty());
+        assertTrue(validator.validate(
+            createBasicFilmBuilder()
+                .duration(1000)
+                .build()
+        ).isEmpty());
+    }
+
+    @Test
+    void shouldNotCreateFilmIfMpaIsNull() {
+        assertFalse(validator.validate(
+            createBasicFilmBuilder()
+                .mpa(null)
+                .build()
+        ).isEmpty());
     }
 }

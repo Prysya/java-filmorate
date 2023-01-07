@@ -19,20 +19,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UserTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    private final String TEST_EMAIL = "test@test.ru";
-    private final String TEST_LOGIN = "login";
-    private final LocalDate TEST_BIRTHADY = LocalDate.of(2000, Month.DECEMBER, 1);
+    private User.UserBuilder createBasicUser() {
+        String TEST_LOGIN = "login";
+        String TEST_EMAIL = "test@test.ru";
+        LocalDate TEST_BIRTHADY = LocalDate.of(2000, Month.DECEMBER, 1);
+
+        return User.builder()
+            .id(1L)
+            .login(TEST_LOGIN)
+            .email(TEST_EMAIL)
+            .birthday(TEST_BIRTHADY);
+    }
 
     @Test
     void shouldNotValidateEmailIfBlank() {
-        User user = new User("", TEST_LOGIN, TEST_BIRTHADY);
+        User user = createBasicUser().email("").build();
 
         assertFalse(validator.validate(user).isEmpty());
     }
 
     @Test
     void shouldNotValidateEmailIfNull() {
-        User user = new User(null, TEST_LOGIN, TEST_BIRTHADY);
+        User user = createBasicUser().email(null).build();
 
         assertFalse(validator.validate(user).isEmpty());
     }
@@ -40,37 +48,36 @@ class UserTest {
     @Test
     void shouldNotValidateEmailIfNotEmail() {
         String[] wrongEmails = {"plainaddress",
-                "#@%^%#$@#$@#.com",
-                "@example.com",
-                "Joe Smith <email@example.com>",
-                "email.example.com",
-                "email@example@example.com",
-                ".email@example.com",
-                "email.@example.com",
-                "email..email@example.com",
-                "email@example.com (Joe Smith)",
-                "email@example",
-                "email@-example.com",
-                "email@111.222.333.44444",
-                "email@example..com",
-                "Abc..123@example.com"};
+            "#@%^%#$@#$@#.com",
+            "@example.com",
+            "Joe Smith <email@example.com>",
+            "email.example.com",
+            "email@example@example.com",
+            ".email@example.com",
+            "email.@example.com",
+            "email..email@example.com",
+            "email@example.com (Joe Smith)",
+            "email@example",
+            "email@-example.com",
+            "email@111.222.333.44444",
+            "email@example..com",
+            "Abc..123@example.com"};
 
         Arrays.stream(wrongEmails).forEach(email -> {
-            System.out.println(email);
-            assertFalse(validator.validate(new User(email, TEST_LOGIN, TEST_BIRTHADY)).isEmpty());
+            assertFalse(validator.validate(createBasicUser().email(email).build()).isEmpty());
         });
     }
 
     @Test
     void shouldNotValidateIfLoginIsNull() {
-        User user = new User(TEST_EMAIL, null, TEST_BIRTHADY);
+        User user = createBasicUser().login(null).build();
 
         assertFalse(validator.validate(user).isEmpty());
     }
 
     @Test
     void shouldNotValidateIfLoginIsBlank() {
-        User user = new User(TEST_EMAIL, "", TEST_BIRTHADY);
+        User user = createBasicUser().login("").build();
 
         assertFalse(validator.validate(user).isEmpty());
     }
@@ -78,30 +85,30 @@ class UserTest {
     @Test
     void shouldNotValidateIfLoginHasWhiteSpaces() {
         String[] wtongLogins = {
-                "l o g i n",
-                "log in",
-                "logi n",
-                "login ",
-                " login",
-                " "
+            "l o g i n",
+            "log in",
+            "logi n",
+            "login ",
+            " login",
+            " "
         };
 
         Arrays.stream(wtongLogins).forEach(login -> {
-            assertFalse(validator.validate(new User(TEST_EMAIL, login, TEST_BIRTHADY)).isEmpty());
+            assertFalse(validator.validate(createBasicUser().login(login).build()).isEmpty());
         });
     }
 
     @Test
     void shouldNotValidateIfBirthdayInFeature() {
-        User user = new User(TEST_EMAIL, TEST_LOGIN, LocalDate.now().plusDays(1));
+        User user = createBasicUser().birthday(LocalDate.now().plusDays(1)).build();
 
         assertFalse(validator.validate(user).isEmpty());
     }
 
     @Test
     void shouldValidateIfBirthdayNowOrBefore() {
-        assertTrue(validator.validate(new User(TEST_EMAIL, TEST_LOGIN, LocalDate.now())).isEmpty());
-        assertTrue(validator.validate(new User(TEST_EMAIL, TEST_LOGIN, LocalDate.now().minusDays(1))).isEmpty());
-        assertTrue(validator.validate(new User(TEST_EMAIL, TEST_LOGIN, LocalDate.now().minusYears(1000))).isEmpty());
+        assertTrue(validator.validate(createBasicUser().birthday(LocalDate.now()).build()).isEmpty());
+        assertTrue(validator.validate(createBasicUser().birthday(LocalDate.now().minusDays(1)).build()).isEmpty());
+        assertTrue(validator.validate(createBasicUser().birthday(LocalDate.now().minusYears(1000)).build()).isEmpty());
     }
 }
