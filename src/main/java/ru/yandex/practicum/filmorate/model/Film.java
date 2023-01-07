@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.annotation.validator.ReleaseDateValidation;
@@ -10,11 +11,15 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Data
+@Builder
 public class Film {
+    /**
+     * Уникальный идентификатор
+     */
+    private Long id;
     /**
      * Константа с максимальной длинной описания
      */
@@ -43,20 +48,12 @@ public class Film {
     @Min(value = 1, message = FilmErrorMessages.duration)
     private final Integer duration;
     /**
-     * Уникальный идентификатор
-     */
-    private Long id = null;
-    /**
-     * Список уникальных идентификаторов пользователей которые поставили лайк
-     */
-    private Set<Long> likes = new HashSet<>();
-    /**
-     * Список жанров
-     */
-    private Set<String> genre = new HashSet<>();
-    /**
      * Рейтинг Ассоциации кинокомпаний
      */
     @NotNull(message = FilmErrorMessages.mpaIsEmpty)
-    private String mpaRating;
+    private Mpa mpa;
+    /**
+     * Жанры
+     */
+    private List<Genre> genres;
 }
