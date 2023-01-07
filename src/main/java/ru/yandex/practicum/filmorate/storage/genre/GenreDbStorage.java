@@ -51,18 +51,6 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public List<Genre> getAll(List<Genre> genres) {
-        if (Objects.isNull(genres) || genres.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        String sqlQuery = "select * from GENRE where GENRE_ID in (?)";
-
-        return jdbcTemplate.query(sqlQuery, Mapper::mapRowToGenre,
-            genres.stream().map(genre -> genre.getId().toString()).collect(Collectors.joining(",")));
-    }
-
-    @Override
     public List<Genre> getFilmGenres(Long filmId) {
         String sqlQuery = "SELECT G.* " +
             "FROM GENRES GS " +

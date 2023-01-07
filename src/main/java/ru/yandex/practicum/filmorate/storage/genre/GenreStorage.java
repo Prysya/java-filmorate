@@ -21,14 +21,6 @@ public interface GenreStorage {
     List<Genre> getAll();
 
     /**
-     * Получение всех жанров из списка идентификаторов
-     *
-     * @param genres список жанров
-     * @return список жанров
-     */
-    List<Genre> getAll(List<Genre> genres);
-
-    /**
      * Получение списка жанров фильма
      *
      * @return список жанров
