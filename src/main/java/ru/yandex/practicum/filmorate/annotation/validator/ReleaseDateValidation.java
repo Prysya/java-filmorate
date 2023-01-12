@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.annotation.validator;
 
-import ru.yandex.practicum.filmorate.constants.FilmErrorMessages;
+import ru.yandex.practicum.filmorate.constant.FilmErrorMessages;
 import ru.yandex.practicum.filmorate.validation.ReleaseDateValidator;
 
 import javax.validation.Constraint;

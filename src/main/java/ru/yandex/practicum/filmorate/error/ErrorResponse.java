@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.errors;
+package ru.yandex.practicum.filmorate.error;
 
 public class ErrorResponse {
     private final String error;

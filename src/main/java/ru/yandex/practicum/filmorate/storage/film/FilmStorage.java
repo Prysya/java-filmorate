@@ -16,10 +16,10 @@ public interface FilmStorage {
     /**
      * Добавление фильма в список
      *
-     * @param item новый фильм
+     * @param film новый фильм
      * @return созданный фильм
      */
-    Film add(Film item);
+    Film add(Film film);
 
     /**
      * Получение листа всех фильмов

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -17,23 +16,23 @@ public interface UserStorage {
     /**
      * Добавление пользователя в список
      *
-     * @param item новый пользователь
+     * @param user новый пользователь
      * @return созданный пользователь
      */
-    User add(User item);
+    User add(User user);
 
     /**
-     * Получение листа всех пользовательов
+     * Получение листа всех пользователей
      *
-     * @return список {@link Film}
+     * @return список {@link User}
      */
     List<User> getAll();
 
     /**
      * Обновление пользователя
      *
-     * @param item пользователь
+     * @param user пользователь
      * @return обновленный пользователь
      */
-    User update(User item);
+    User update(User user);
 }
