@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.constant.FilmErrorMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -9,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.filmGenre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -20,26 +19,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikesStorage likesStorage;
     private final MpaStorage mpaStorage;
-    private final GenreStorage genreStorage;
-
-    @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage,
-                       @Qualifier("likesDbStorage") LikesStorage likesStorage,
-                       @Qualifier("mpaDbStorage") MpaStorage mpaStorage,
-                       @Qualifier("genreDbStorage") GenreStorage genreStorage
-    ) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-        this.likesStorage = likesStorage;
-        this.genreStorage = genreStorage;
-        this.mpaStorage = mpaStorage;
-    }
+    private final FilmGenreStorage filmGenreStorage;
 
     public List<Film> getAll() {
         return setMpaAndGenres(filmStorage.getAll());
@@ -94,7 +80,7 @@ public class FilmService {
     private Film setMpaAndGenres(Film film) {
         if (Objects.nonNull(film.getGenres())) {
             try {
-                List<Genre> genres = genreStorage.getFilmGenres(film.getId());
+                List<Genre> genres = filmGenreStorage.getFilmGenres(film.getId());
                 film.setGenres(genres);
             } catch (Exception ignored) {
             }
@@ -113,7 +99,7 @@ public class FilmService {
 
     private void setGenres(Film film, List<Genre> genres) {
         if (Objects.nonNull(film) && Objects.nonNull(genres)) {
-            genreStorage.setFilmGenres(film.getId(), genres);
+            filmGenreStorage.setFilmGenres(film.getId(), genres);
         }
     }
 }

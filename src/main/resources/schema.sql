@@ -1,6 +1,6 @@
 drop table if exists FRIENDSHIP_STATUS;
-drop table if exists GENRES;
-drop table if exists GENRE;
+drop table if exists FILM_GENRES;
+drop table if exists FILM_GENRE;
 drop table if exists LIKES;
 drop table if exists FILMS;
 drop table if exists MPA_RATING;
@@ -10,21 +10,21 @@ create user if not exists sa password 'password' admin; -- создать пол
 
 create table if not exists users
 (
-    email    CHARACTER VARYING not null,
-    login    CHARACTER VARYING not null,
+    email    varchar not null,
+    login    varchar not null,
     birthday DATE              not null,
-    name     CHARACTER VARYING,
+    name     varchar,
     user_id  INTEGER auto_increment,
     constraint users_pk
         primary key (user_id),
-    constraint uq_users_email UNIQUE (email)
+    constraint uq_users_email UNIQUE (email),
+    constraint uq_users_login UNIQUE (login)
 );
 
 create table if not exists friendship_status
 (
     user_id             INTEGER not null,
     friend_id           INTEGER not null,
-    is_confirmed        bool    not null,
     constraint friendship_status_pk
         primary key (user_id, friend_id),
     constraint "friendship_status_USERS_USER_ID_fk"
@@ -69,23 +69,23 @@ create table if not exists likes
         foreign key (film_id) references films
 );
 
-create table if not exists genre
+create table if not exists film_genre
 (
-    genre_name varchar not null,
-    genre_id   INTEGER auto_increment,
-    constraint genre_pk
-        primary key (genre_id)
+    film_genre_name varchar not null,
+    film_genre_id   INTEGER auto_increment,
+    constraint film_genre_pk
+        primary key (film_genre_id)
 );
 
 
-create table if not exists genres
+create table if not exists film_genres
 (
     film_id   INTEGER not null,
-    genre_id  INTEGER not null,
-    constraint genres_id
-        primary key (film_id, genre_id),
-    constraint "genres_genre_genre_id_fk"
-        foreign key (genre_id) references genre,
-    constraint "genres_films_film_id_fk"
+    film_genre_id  INTEGER not null,
+    constraint film_genres_id
+        primary key (film_id, film_genre_id),
+    constraint "film_genres_genre_genre_id_fk"
+        foreign key (film_genre_id) references film_genre,
+    constraint "film_genres_films_film_id_fk"
         foreign key (film_id) references films
 );

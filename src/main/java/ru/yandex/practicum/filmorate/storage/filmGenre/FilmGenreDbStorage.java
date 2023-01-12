@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.genre;
+package ru.yandex.practicum.filmorate.storage.filmGenre;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
@@ -9,25 +9,23 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.utils.Mapper;
 
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class GenreDbStorage implements GenreStorage {
+public class FilmGenreDbStorage implements FilmGenreStorage {
     private final String NOT_FOUND_MESSAGE = "Жанр не найден";
     private final JdbcTemplate jdbcTemplate;
 
-    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
+    public FilmGenreDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
 
     @Override
     public Genre get(Long id) {
-        String sqlQuery = "select * from GENRE WHERE GENRE_ID = ?";
+        String sqlQuery = "select * from FILM_GENRE WHERE FILM_GENRE_ID = ?";
 
         try {
             Genre genre = jdbcTemplate.queryForObject(sqlQuery, Mapper::mapRowToGenre, id);
@@ -37,6 +35,7 @@ public class GenreDbStorage implements GenreStorage {
                 return genre;
             }
         } catch (Exception ignored) {
+
         }
 
         log.info("Жанр с идентификатором {} не найден.", id);
@@ -45,18 +44,18 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public List<Genre> getAll() {
-        String sqlQuery = "select * from GENRE";
+        String sqlQuery = "select * from FILM_GENRE";
 
         return jdbcTemplate.query(sqlQuery, Mapper::mapRowToGenre);
     }
 
     @Override
     public List<Genre> getFilmGenres(Long filmId) {
-        String sqlQuery = "SELECT G.* " +
-            "FROM GENRES GS " +
-            "JOIN GENRE G on G.GENRE_ID = GS.GENRE_ID " +
+        String sqlQuery = "SELECT FG.* " +
+            "FROM FILM_GENRES FGS " +
+            "JOIN FILM_GENRE FG on FG.FILM_GENRE_ID = FGS.FILM_GENRE_ID " +
             "WHERE FILM_ID = ? " +
-            "ORDER BY GENRE_ID";
+            "ORDER BY FILM_GENRE_ID";
 
         return jdbcTemplate.query(sqlQuery, Mapper::mapRowToGenre, filmId);
     }
@@ -73,7 +72,7 @@ public class GenreDbStorage implements GenreStorage {
             return;
         }
 
-        String sqlQuery = "insert into GENRES(FILM_ID, GENRE_ID) " +
+        String sqlQuery = "insert into FILM_GENRES(FILM_ID, FILM_GENRE_ID) " +
             "values ( ?, ? )";
 
         try {
@@ -87,7 +86,7 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public void deleteFilmGenres(Long filmId) {
-        String sqlQuery = "delete from GENRES " +
+        String sqlQuery = "delete from FILM_GENRES " +
             "where FILM_ID = ?";
 
         jdbcTemplate.update(sqlQuery, filmId);

@@ -1,4 +1,4 @@
-INSERT INTO PUBLIC.GENRE (GENRE_NAME)
+INSERT INTO PUBLIC.FILM_GENRE (FILM_GENRE_NAME)
 VALUES ('Комедия'),
        ('Драма'),
        ('Мультфильм'),

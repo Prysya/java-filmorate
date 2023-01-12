@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.genre;
+package ru.yandex.practicum.filmorate.storage.filmGenre;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class GenreDbStorageTest {
 
-    private final GenreDbStorage genreStorage;
+    private final FilmGenreDbStorage genreStorage;
     private final FilmDbStorage filmStorage;
 
     private Film createBasicFilm() {
