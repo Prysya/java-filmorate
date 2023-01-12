@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +16,9 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/mpa")
+@RequiredArgsConstructor
 public class MpaController {
     private final MpaService mpaService;
-
-    @Autowired
-    public MpaController(MpaService mpaService) {
-        this.mpaService = mpaService;
-    }
 
     @GetMapping
     public List<Mpa> getAll() {
@@ -29,7 +26,7 @@ public class MpaController {
     }
 
     @GetMapping("/{genreId}")
-    public Mpa getById(@PathVariable Long genreId) throws NotFoundException {
+    public Mpa getById(@PathVariable Long genreId) {
         return mpaService.getById(genreId);
     }
 }
