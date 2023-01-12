@@ -70,7 +70,7 @@ public class UserDbStorage implements UserStorage {
                 return get(key.longValue());
             }
         } catch (DuplicateKeyException e) {
-            throw new NotUniqueException(UserErrorMessages.notUniqeEmail);
+            throw new NotUniqueException(UserErrorMessages.notUnique);
         }
 
 
