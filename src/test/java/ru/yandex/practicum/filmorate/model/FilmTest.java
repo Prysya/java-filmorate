@@ -11,6 +11,7 @@ import javax.validation.Validator;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +25,7 @@ class FilmTest {
             .name("name")
             .duration(1)
             .releaseDate(LocalDate.of(2000, Month.OCTOBER, 10))
-            .genres(new ArrayList<>())
+            .genres(new LinkedHashSet<>())
             .mpa(Mpa.builder().id(1L).build());
     }
 

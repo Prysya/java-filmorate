@@ -31,16 +31,16 @@ class UserDbStorageTest {
     }
 
     @Test
-    void shouldThrowNotFoundIfUserNotExists() {
-        assertThrows(NotFoundException.class, () -> userStorage.get(9999999L));
+    void shouldBeEmptyIfUserNotExists() {
+        assertTrue(userStorage.get(9999999L).isEmpty());
     }
 
     @Test
     void shouldCreateAndFindUserInDatabase() {
-        User createdUser = userStorage.add(createBasicUser().build());
+        User createdUser = userStorage.add(createBasicUser().build()).get();
         User user = userStorage.get(
             createdUser.getId()
-        );
+        ).get();
 
         assertThat(user).hasFieldOrPropertyWithValue("id", 1L);
     }
@@ -50,7 +50,7 @@ class UserDbStorageTest {
         final int USERS_COUNT = 5;
 
         for (int i = 0; i < USERS_COUNT; i += 1) {
-            userStorage.add(createBasicUser().email("test@test" + i).build());
+            userStorage.add(createBasicUser().email("test@test" + i).login("login" + i).build());
         }
 
         List<User> users = userStorage.getAll();
@@ -68,7 +68,7 @@ class UserDbStorageTest {
 
     @Test
     void shouldUpdateUser() {
-        User createdUser = userStorage.add(createBasicUser().build());
+        User createdUser = userStorage.add(createBasicUser().build()).get();
 
         User userForUpdate = User.builder()
             .id(createdUser.getId())
@@ -78,7 +78,7 @@ class UserDbStorageTest {
             .login("new login")
             .build();
 
-        User updatedUser = userStorage.update(userForUpdate);
+        User updatedUser = userStorage.update(userForUpdate).get();
 
         assertEquals(userForUpdate, updatedUser);
     }

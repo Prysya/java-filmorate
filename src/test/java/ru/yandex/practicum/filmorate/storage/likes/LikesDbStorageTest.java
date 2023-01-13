@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @SpringBootTest(properties = {"spring.config.name=myapp-test-h2", "spring.datasource.url=jdbc:h2:mem:trxServiceStatus"})
@@ -33,10 +34,10 @@ class LikesDbStorageTest {
 
         for (int i = 0; i < USERS_COUNT; i += 1) {
             users.add(userStorage.add(User.builder()
-                .login("login")
+                .login("login" + i)
                 .email("test@test.ru" + i)
                 .birthday(LocalDate.of(2000, Month.DECEMBER, 1))
-                .build()));
+                .build()).get());
         }
 
         return users;
@@ -47,9 +48,10 @@ class LikesDbStorageTest {
             .name("Film")
             .duration(2)
             .releaseDate(LocalDate.now())
-            .mpa(Mpa.builder().id(1L).build())
+            .mpa(Mpa.builder().id(1L).name("G").build())
             .description("")
-            .build());
+                .genres(new LinkedHashSet<>())
+            .build()).get();
     }
 
     @Test

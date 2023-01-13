@@ -32,10 +32,10 @@ class FriendsDbStorageTest {
 
         for (int i = 0; i < USERS_COUNT; i += 1) {
             users.add(userStorage.add(User.builder()
-                .login("login")
+                .login("login" + i)
                 .email("test@test.ru" + i)
                 .birthday(LocalDate.of(2000, Month.DECEMBER, 1))
-                .build()));
+                .build()).get());
         }
 
         return users;

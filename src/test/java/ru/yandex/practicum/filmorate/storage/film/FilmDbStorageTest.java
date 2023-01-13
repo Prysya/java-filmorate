@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,10 +28,10 @@ class FilmDbStorageTest {
             .name("Film")
             .duration(2)
             .releaseDate(LocalDate.now())
-            .mpa(Mpa.builder().id(1L).build())
+            .mpa(Mpa.builder().id(1L).name("G").build())
             .description("")
-                .genres(new ArrayList<>())
-            .build());
+                .genres(new LinkedHashSet<>())
+            .build()).get();
     }
 
     @Test
@@ -39,7 +40,7 @@ class FilmDbStorageTest {
 
         assertThat(newFilm).hasFieldOrPropertyWithValue("id", 1L);
 
-        assertEquals(newFilm, filmStorage.get(newFilm.getId()));
+        assertEquals(newFilm, filmStorage.get(newFilm.getId()).get());
     }
 
     @Test
@@ -69,6 +70,6 @@ class FilmDbStorageTest {
 
         filmStorage.update(newFilm);
 
-        assertEquals(newFilm, filmStorage.get(film.getId()));
+        assertEquals(newFilm, filmStorage.get(film.getId()).get());
     }
 }

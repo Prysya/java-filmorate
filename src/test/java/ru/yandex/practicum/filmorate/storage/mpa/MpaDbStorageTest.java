@@ -25,7 +25,7 @@ class MpaDbStorageTest {
 
     @Test
     void shouldReturnMpaById() {
-        Mpa mpa = mpaStrorage.get(1L);
+        Mpa mpa = mpaStrorage.get(1L).get();
 
         assertEquals(mpa.getClass(), Mpa.class);
         assertTrue(Objects.nonNull(mpa.getId()));
