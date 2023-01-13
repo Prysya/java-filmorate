@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Genre {
+public class FilmGenre {
     /**
      * Уникальный идентификатор
      */

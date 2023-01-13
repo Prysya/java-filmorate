@@ -2,20 +2,19 @@ package ru.yandex.practicum.filmorate.storage.filmGenre;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.utils.Mapper;
 
 import java.sql.PreparedStatement;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Component
 public class FilmGenreDbStorage implements FilmGenreStorage {
-    private final String NOT_FOUND_MESSAGE = "Жанр не найден";
     private final JdbcTemplate jdbcTemplate;
 
     public FilmGenreDbStorage(JdbcTemplate jdbcTemplate) {
@@ -24,44 +23,65 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
 
 
     @Override
-    public Genre get(Long id) {
+    public Optional<FilmGenre> get(Long id) {
         String sqlQuery = "select * from FILM_GENRE WHERE FILM_GENRE_ID = ?";
 
         try {
-            Genre genre = jdbcTemplate.queryForObject(sqlQuery, Mapper::mapRowToGenre, id);
-
-            if (Objects.nonNull(genre)) {
-                log.info("Найден жанр: {} {}", genre.getId(), genre.getName());
-                return genre;
-            }
-        } catch (Exception ignored) {
-
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, Mapper::mapRowToGenre, id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
-
-        log.info("Жанр с идентификатором {} не найден.", id);
-        throw new NotFoundException(NOT_FOUND_MESSAGE);
     }
 
     @Override
-    public List<Genre> getAll() {
+    public List<FilmGenre> getAll() {
         String sqlQuery = "select * from FILM_GENRE";
 
         return jdbcTemplate.query(sqlQuery, Mapper::mapRowToGenre);
     }
 
     @Override
-    public List<Genre> getFilmGenres(Long filmId) {
+    public Set<FilmGenre> getFilmGenres(Long filmId) {
         String sqlQuery = "SELECT FG.* " +
             "FROM FILM_GENRES FGS " +
             "JOIN FILM_GENRE FG on FG.FILM_GENRE_ID = FGS.FILM_GENRE_ID " +
             "WHERE FILM_ID = ? " +
             "ORDER BY FILM_GENRE_ID";
 
-        return jdbcTemplate.query(sqlQuery, Mapper::mapRowToGenre, filmId);
+        return new LinkedHashSet<>(jdbcTemplate.query(sqlQuery, Mapper::mapRowToGenre, filmId));
     }
 
     @Override
-    public void setFilmGenres(Long filmId, List<Genre> genres) {
+    public Map<Long, Set<FilmGenre>> getFilmGenres(List<Film> films) {
+        Map<Long, Set<FilmGenre>> genresById = new HashMap<>();
+
+        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
+        String sqlQuery = "SELECT FGS.*, FG.FILM_GENRE_NAME " +
+            "FROM FILM_GENRES FGS " +
+            "JOIN FILM_GENRE FG on FG.FILM_GENRE_ID = FGS.FILM_GENRE_ID " +
+            "WHERE FILM_ID IN (%s)";
+
+        jdbcTemplate.query(
+            String.format(sqlQuery, inSql),
+            (rs, rowNum) -> {
+                Long filmId = rs.getLong("film_id");
+                FilmGenre filmGenre = Mapper.mapRowToGenre(rs, rowNum);
+                Set<FilmGenre> genres = genresById.getOrDefault(filmId, new LinkedHashSet<>());
+                genres.add(filmGenre);
+
+                return genresById.put(
+                    filmId,
+                    genres
+                );
+            },
+            films.stream().map(film -> film.getId().toString()).toArray()
+        );
+
+        return genresById;
+    }
+
+    @Override
+    public void setFilmGenres(Long filmId, Set<FilmGenre> genres) {
         if (Objects.isNull(genres)) {
             return;
         }
@@ -76,7 +96,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
             "values ( ?, ? )";
 
         try {
-            jdbcTemplate.batchUpdate(sqlQuery, genres, 100, (PreparedStatement ps, Genre genre) -> {
+            jdbcTemplate.batchUpdate(sqlQuery, genres, 100, (PreparedStatement ps, FilmGenre genre) -> {
                 ps.setLong(1, filmId);
                 ps.setLong(2, genre.getId());
             });
