@@ -53,10 +53,10 @@ FROM mpa_rating;
 
 ```sql
 SELECT *
-FROM genres;
+FROM FILM_GENRE;
 ```
 
-| genre\_id | name           |
+| filmGenre\_id | name           |
 |:---------:|:---------------|
 |     1     | Комедия        |
 |     2     | Драма          |
@@ -69,31 +69,31 @@ FROM genres;
 
 ```sql
 SELECT f.name as film_name,
-       g.name as genre
+       g.FILM_GENRE_NAME as film_genre
 FROM films f
-         JOIN genres as gs ON f.film_id = gs.film_id
-         JOIN genre as g ON gs.genre_id = g.genre_id;
+         JOIN FILM_GENRES as gs ON f.film_id = gs.film_id
+         JOIN FILM_GENRE as g ON gs.FILM_GENRE_ID = g.FILM_GENRE_ID;
 ```
 
-| film_name      | genre   |
-|:---------------|:--------|
-| Шестой элемент | Комедия |
+| film_name      | filmGenre |
+|:---------------|:----------|
+| Шестой элемент | Комедия   |
 
 ### Получение списка фильмов и их жанров
 
 ```sql
 SELECT f.name as film_name,
-       g.name as genre
+       g.FILM_GENRE_NAME as film_genre
 FROM films as f
-         LEFT JOIN genres as gs ON f.film_id = gs.film_id
-         LEFT JOIN genre as g ON gs.genre_id = g.genre_id;
+         LEFT JOIN FILM_GENRES as gs ON f.film_id = gs.film_id
+         LEFT JOIN FILM_GENRE as g ON gs.FILM_GENRE_ID = g.FILM_GENRE_ID;
 ```
 
-| film_name      | genre   |
-|:---------------|:--------|
-| Аэроплан       | Комедия |
-| Шестой элемент | Комедия |
-| Один дома      | Боевик  |
+| film_name      | film\_genre |
+|:---------------|:------------|
+| Аэроплан       | Комедия     |
+| Шестой элемент | Комедия     |
+| Один дома      | Боевик      |
 
 ### Получение всего списка друзей
 
@@ -112,12 +112,12 @@ FROM users
 | 3        | jumba@script.py | Rochan  | Александр | 1850-11-10 | 5              | 3        | 1          | true        |
 | 3        | jumba@script.py | Rochan  | Александр | 1850-11-10 | 6              | 3        | 2          | false       |
 
-### Получение списка друзей Александра
+### Получение списка друзей Дмитрия
 
 ```sql
 SELECT *
 FROM users
-WHERE user_id IN (SELECT f.friend_id
+WHERE user_id IN (SELECT fs.friend_id
                   FROM users as u
                            JOIN friendship_status as fs ON u.user_id = fs.user_id
                   WHERE u.user_id = 3);
