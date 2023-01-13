@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.annotation.validator.ReleaseDateValidation;
 import ru.yandex.practicum.filmorate.constant.FilmErrorMessages;
@@ -11,17 +13,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
+@Jacksonized
 @Builder
 public class Film {
-    /**
-     * Уникальный идентификатор
-     */
-    private Long id;
     /**
      * Константа с максимальной длинной описания
      */
@@ -50,6 +48,10 @@ public class Film {
     @Min(value = 1, message = FilmErrorMessages.duration)
     private final Integer duration;
     /**
+     * Уникальный идентификатор
+     */
+    private Long id;
+    /**
      * Рейтинг Ассоциации кинокомпаний
      */
     @NotNull(message = FilmErrorMessages.mpaIsEmpty)
@@ -57,5 +59,6 @@ public class Film {
     /**
      * Жанры
      */
-    private Set<Genre> genres;
+    @JsonDeserialize(as = LinkedHashSet.class)
+    private Set<FilmGenre> genres;
 }
