@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.constant.UserErrorMessages;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotUniqueException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.Converter;
@@ -16,41 +17,32 @@ import ru.yandex.practicum.filmorate.utils.Mapper;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-
     @Override
-    public User get(Long id) {
-        String sqlQuery = "select * from USERS where USER_ID = ?";
+    public Optional<User> get(Long id) {
+        String sqlQuery = "select * " +
+            "from USERS " +
+            "where USER_ID = ?";
 
         try {
-            User user = jdbcTemplate.queryForObject(sqlQuery, Mapper::mapRowToUser, id);
-
-            if (Objects.nonNull(user)) {
-                log.info("Найден пользователь: {} {}", user.getId(), user.getLogin());
-                return user;
-            }
-        } catch (Exception ignored) {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, Mapper::mapRowToUser, id));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
-
-        log.info("Пользователь с идентификатором {} не найден.", id);
-        throw new NotFoundException(UserErrorMessages.notFound);
     }
 
     @Override
-    public User add(User user) {
-        checkAndUpdateName(user);
-
+    public Optional<User> add(User user) {
         String sqlQuery = "insert into USERS(email, login, birthday, name) " +
             "values (?, ?, ?, ?)";
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         try {
@@ -63,19 +55,13 @@ public class UserDbStorage implements UserStorage {
                 return stmt;
             }, keyHolder);
 
-
-            Number key = keyHolder.getKey();
-            if (Objects.nonNull(key)) {
-                log.info("Айди созданного пользователя: {}", key);
-                return get(key.longValue());
-            }
+            user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+            return Optional.of(user);
         } catch (DuplicateKeyException e) {
             throw new NotUniqueException(UserErrorMessages.notUnique);
+        } catch (NullPointerException e) {
+            return Optional.empty();
         }
-
-
-        log.info("Пользователь не создан");
-        return null;
     }
 
     @Override
@@ -86,9 +72,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user) {
-        checkAndUpdateName(user);
-
+    public Optional<User> update(User user) {
         String sqlQuery = "update USERS set " +
             "EMAIL = ?, LOGIN = ?, BIRTHDAY = ?, NAME = ? " +
             "where USER_ID = ?";
@@ -101,17 +85,6 @@ public class UserDbStorage implements UserStorage {
             user.getId()
         );
 
-        if (status > 0) {
-            log.info("Пользователь с id = {} успешно обновлен", user.getId());
-            return get(user.getId());
-        }
-
-        throw new NotFoundException(UserErrorMessages.notFound);
-    }
-
-    private void checkAndUpdateName(User user) {
-        if (Objects.isNull(user.getName()) || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        return status > 0 ? Optional.of(user) : Optional.empty();
     }
 }

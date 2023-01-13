@@ -20,9 +20,8 @@ public class LikesDbStorage implements LikesStorage {
 
     @Override
     public List<Long> get(Long filmId) {
-        String sqlQuery = "SELECT U.USER_ID " +
+        String sqlQuery = "SELECT USER_ID " +
             "FROM LIKES " +
-            "JOIN USERS U on U.USER_ID = LIKES.USER_ID " +
             "WHERE FILM_ID = ?";
 
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("user_id"), filmId);
@@ -35,11 +34,10 @@ public class LikesDbStorage implements LikesStorage {
 
         try {
             jdbcTemplate.update(sqlQuery, filmId, userId);
+            log.info("Пользователь с id = {} поставил лайк фильму с id = {}", userId, filmId);
         } catch (DuplicateKeyException ignored) {
             log.warn("Пользователь с id = {} уже ставил лайк фильму с id = {}", userId, filmId);
         }
-
-        log.info("Пользователь с id = {} поставил лайк фильму с id = {}", userId, filmId);
     }
 
     @Override
@@ -52,9 +50,10 @@ public class LikesDbStorage implements LikesStorage {
 
     @Override
     public List<Film> getMostLikedFilms(int count) {
-        String sqlQuery = "SELECT F.* " +
+        String sqlQuery = "SELECT F.*, MR.MPA_RATING_NAME " +
             "FROM FILMS AS F " +
             "LEFT JOIN LIKES L on F.FILM_ID = L.FILM_ID " +
+            "LEFT JOIN MPA_RATING MR on MR.MPA_RATING_ID = F.MPA_RATING_ID " +
             "GROUP BY F.FILM_ID, F.NAME " +
             "ORDER BY COUNT(L.USER_ID) DESC " +
             "LIMIT ?";

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FilmStorage {
     /**
@@ -11,7 +12,7 @@ public interface FilmStorage {
      * @param id уникальный идентификатор
      * @return найденный фильм
      */
-    Film get(Long id);
+    Optional<Film> get(Long id);
 
     /**
      * Добавление фильма в список
@@ -19,7 +20,7 @@ public interface FilmStorage {
      * @param film новый фильм
      * @return созданный фильм
      */
-    Film add(Film film);
+    Optional<Film> add(Film film);
 
     /**
      * Получение листа всех фильмов
@@ -34,5 +35,5 @@ public interface FilmStorage {
      * @param film фильм
      * @return обновленный фильм
      */
-    Film update(Film film);
+    Optional<Film> update(Film film);
 }
