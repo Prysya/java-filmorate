@@ -12,7 +12,7 @@ create table if not exists users
 (
     email    varchar not null,
     login    varchar not null,
-    birthday DATE              not null,
+    birthday DATE    not null,
     name     varchar,
     user_id  INTEGER auto_increment,
     constraint users_pk
@@ -23,8 +23,8 @@ create table if not exists users
 
 create table if not exists friendship_status
 (
-    user_id             INTEGER not null,
-    friend_id           INTEGER not null,
+    user_id   INTEGER not null,
+    friend_id INTEGER not null,
     constraint friendship_status_pk
         primary key (user_id, friend_id),
     constraint "friendship_status_USERS_USER_ID_fk"
@@ -37,8 +37,8 @@ create table if not exists friendship_status
 
 create table if not exists mpa_rating
 (
-    mpa_rating_name   varchar not null,
-    mpa_rating_id INTEGER auto_increment,
+    mpa_rating_name varchar not null,
+    mpa_rating_id   INTEGER auto_increment,
     constraint mpa_rating_pk
         primary key (mpa_rating_id)
 );
@@ -80,8 +80,8 @@ create table if not exists film_genre
 
 create table if not exists film_genres
 (
-    film_id   INTEGER not null,
-    film_genre_id  INTEGER not null,
+    film_id       INTEGER not null,
+    film_genre_id INTEGER not null,
     constraint film_genres_id
         primary key (film_id, film_genre_id),
     constraint "film_genres_genre_genre_id_fk"

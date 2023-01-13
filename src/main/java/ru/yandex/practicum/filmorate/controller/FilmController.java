@@ -2,22 +2,23 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
+@Validated
 public class FilmController {
+    private static final String DEFAUILT_MOST_LIKED_COUNT = "10";
 
     private final FilmService filmService;
 
@@ -53,7 +54,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getById(@RequestParam(required = false) Optional<Integer> count) {
+    public List<Film> getById(@Positive @RequestParam(defaultValue = DEFAUILT_MOST_LIKED_COUNT) Integer count) {
         return filmService.getMostLiked(count);
     }
 }

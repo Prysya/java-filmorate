@@ -2,13 +2,13 @@ package ru.yandex.practicum.filmorate.utils;
 
 import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 @UtilityClass
 public class Mapper {
@@ -29,15 +29,15 @@ public class Mapper {
             .description(resultSet.getString("description"))
             .releaseDate(resultSet.getDate("release_date").toLocalDate())
             .duration(resultSet.getInt("duration"))
-            .genres(new ArrayList<>())
-            .mpa(Mpa.builder().id(resultSet.getLong("mpa_rating_id")).build())
+            .genres(new LinkedHashSet<>())
+            .mpa(mapRowToMpa(resultSet, rowNum))
             .build();
     }
 
-    public static Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        return Genre.builder()
-            .id(resultSet.getLong("genre_id"))
-            .name(resultSet.getString("genre_name"))
+    public static FilmGenre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+        return FilmGenre.builder()
+            .id(resultSet.getLong("film_genre_id"))
+            .name(resultSet.getString("film_genre_name"))
             .build();
     }
 

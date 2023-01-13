@@ -12,14 +12,6 @@ import java.time.LocalDate;
 @Builder
 public class User {
     /**
-     * Уникальный идентификатор
-     */
-    private Long id;
-    /**
-     * Имя для отображения
-     */
-    private String name;
-    /**
      * Электронная почта
      */
     @NotBlank(message = UserErrorMessages.email)
@@ -37,4 +29,12 @@ public class User {
     @NotNull(message = UserErrorMessages.birthdayRequired)
     @PastOrPresent(message = UserErrorMessages.birthday)
     private final LocalDate birthday;
+    /**
+     * Уникальный идентификатор
+     */
+    private Long id;
+    /**
+     * Имя для отображения
+     */
+    private String name;
 }

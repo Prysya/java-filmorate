@@ -1,105 +1,97 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.constant.FilmErrorMessages;
+import ru.yandex.practicum.filmorate.constant.UserErrorMessages;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmGenre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikesStorage likesStorage;
-    private final MpaStorage mpaStorage;
     private final FilmGenreStorage filmGenreStorage;
 
     public List<Film> getAll() {
-        return setMpaAndGenres(filmStorage.getAll());
+        return setGenres(filmStorage.getAll());
     }
 
     public Film create(Film film) {
-        Film newFilm = filmStorage.add(film);
-        setGenres(newFilm, film.getGenres());
-        return setMpaAndGenres(newFilm);
+        Film createdFilm = checkFilmIsExists(filmStorage.add(film), film.getId());
+        filmGenreStorage.setFilmGenres(film.getId(), film.getGenres());
+
+        return setGenres(createdFilm);
     }
 
-    public Film update(Film film) throws NotFoundException {
-        Film newFilm = filmStorage.update(film);
+    public Film update(Film film) {
+        Film updatedFilm = checkFilmIsExists(filmStorage.update(film), film.getId());
+        filmGenreStorage.setFilmGenres(film.getId(), film.getGenres());
 
-        if (Objects.isNull(newFilm)) {
-            throw new NotFoundException(FilmErrorMessages.notFound);
-        }
-
-        setGenres(newFilm, film.getGenres());
-
-        return setMpaAndGenres(newFilm);
+        return setGenres(updatedFilm);
     }
 
-    public Film getById(Long id) throws NotFoundException {
-        return setMpaAndGenres(filmStorage.get(id));
+    public Film getById(Long id) {
+        return setGenres(checkFilmIsExists(filmStorage.get(id), id));
     }
 
-    public void addLike(Long filmId, Long userId) throws NotFoundException {
-        filmStorage.get(filmId);
-        userStorage.get(userId);
+    public void addLike(Long filmId, Long userId) {
+        checkFilmAndUserIsExists(filmId, userId);
 
         likesStorage.add(filmId, userId);
     }
 
-    public void deleteLike(Long filmId, Long userId) throws NotFoundException {
-        filmStorage.get(filmId);
-        userStorage.get(userId);
+    public void deleteLike(Long filmId, Long userId) {
+        checkFilmAndUserIsExists(filmId, userId);
 
         likesStorage.delete(filmId, userId);
     }
 
-    public List<Film> getMostLiked(Optional<Integer> count) {
-        final int DEFAUILT_MOST_LIKED_COUNT = 10;
-
-        return setMpaAndGenres(likesStorage.getMostLikedFilms(count.orElse(DEFAUILT_MOST_LIKED_COUNT)));
+    public List<Film> getMostLiked(Integer count) {
+        return setGenres(likesStorage.getMostLikedFilms(count));
     }
 
-    private List<Film> setMpaAndGenres(List<Film> films) {
-        return films.stream().peek(this::setMpaAndGenres).collect(Collectors.toList());
+    private List<Film> setGenres(List<Film> films) {
+        Map<Long, Set<FilmGenre>> genres = filmGenreStorage.getFilmGenres(films);
+
+        return films.stream().peek(film -> {
+            if (genres.containsKey(film.getId())) {
+                film.setGenres(genres.get(film.getId()));
+            }
+        }).collect(Collectors.toList());
     }
 
-    private Film setMpaAndGenres(Film film) {
+    private Film setGenres(Film film) {
         if (Objects.nonNull(film.getGenres())) {
             try {
-                List<Genre> genres = filmGenreStorage.getFilmGenres(film.getId());
-                film.setGenres(genres);
+                Set<FilmGenre> filmGenres = filmGenreStorage.getFilmGenres(film.getId());
+                film.setGenres(filmGenres);
             } catch (Exception ignored) {
             }
         }
-
-        if (Objects.nonNull(film.getMpa())) {
-            try {
-                Mpa mpa = mpaStorage.get(film.getMpa().getId());
-                film.setMpa(mpa);
-            } catch (Exception ignored) {
-            }
-        }
-
         return film;
     }
 
-    private void setGenres(Film film, List<Genre> genres) {
-        if (Objects.nonNull(film) && Objects.nonNull(genres)) {
-            filmGenreStorage.setFilmGenres(film.getId(), genres);
-        }
+    private Film checkFilmIsExists(Optional<Film> film, Long filmId) {
+        return film
+            .orElseThrow(() -> new NotFoundException(String.format(FilmErrorMessages.notFound, filmId)));
+    }
+
+    private void checkFilmAndUserIsExists(Long filmId, Long userId) {
+        checkFilmIsExists(filmStorage.get(filmId), filmId);
+        userStorage.get(userId)
+            .orElseThrow(() -> new NotFoundException(String.format(UserErrorMessages.notFound, userId)));
     }
 }

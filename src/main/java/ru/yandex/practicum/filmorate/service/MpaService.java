@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -19,7 +17,8 @@ public class MpaService {
         return mpaStorage.getAll();
     }
 
-    public Mpa getById(Long id) throws NotFoundException {
-        return mpaStorage.get(id);
+    public Mpa getById(Long id) {
+        return mpaStorage.get(id)
+            .orElseThrow(() -> new NotFoundException("Рейтинг ассоциации не найден"));
     }
 }
