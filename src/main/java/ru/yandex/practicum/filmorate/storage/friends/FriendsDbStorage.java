@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.Mapper;
 
@@ -55,7 +54,7 @@ public class FriendsDbStorage implements FriendsStorage {
     }
 
     @Override
-    public void delete(Long userId, Long friendId) throws NotFoundException {
+    public void delete(Long userId, Long friendId) {
         String sqlQuery = "delete from FRIENDSHIP_STATUS " +
             "where USER_ID = ? and FRIEND_ID = ?";
 

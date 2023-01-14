@@ -13,7 +13,10 @@ import ru.yandex.practicum.filmorate.storage.filmGenre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,31 +33,33 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        Film createdFilm = checkFilmIsExists(filmStorage.add(film), film.getId());
+        Film createdFilm = filmStorage.add(film);
         filmGenreStorage.setFilmGenres(film.getId(), film.getGenres());
 
         return setGenres(createdFilm);
     }
 
     public Film update(Film film) {
-        Film updatedFilm = checkFilmIsExists(filmStorage.update(film), film.getId());
+        Film updatedFilm = filmStorage.update(film);
         filmGenreStorage.setFilmGenres(film.getId(), film.getGenres());
 
         return setGenres(updatedFilm);
     }
 
     public Film getById(Long id) {
-        return setGenres(checkFilmIsExists(filmStorage.get(id), id));
+        Film film =
+            filmStorage.get(id).orElseThrow(() -> new NotFoundException(String.format(FilmErrorMessages.notFound, id)));
+
+        return setGenres(film);
     }
 
     public void addLike(Long filmId, Long userId) {
-        checkFilmAndUserIsExists(filmId, userId);
-
+        checkFilmAndUserExists(filmId, userId);
         likesStorage.add(filmId, userId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        checkFilmAndUserIsExists(filmId, userId);
+        checkFilmAndUserExists(filmId, userId);
 
         likesStorage.delete(filmId, userId);
     }
@@ -84,13 +89,14 @@ public class FilmService {
         return film;
     }
 
-    private Film checkFilmIsExists(Optional<Film> film, Long filmId) {
-        return film
+    /*
+     * При отсутствии айди в бд вылезает ошибка JdbcSQLIntegrityConstraintViolationException
+     * считаю что проверку сущностей в БД в сервисе является правильным решением,
+     * так же, благодаря той проверке гараздо инормативная ошибка, чем писать общую
+     */
+    private void checkFilmAndUserExists(Long filmId, Long userId) {
+        filmStorage.get(filmId)
             .orElseThrow(() -> new NotFoundException(String.format(FilmErrorMessages.notFound, filmId)));
-    }
-
-    private void checkFilmAndUserIsExists(Long filmId, Long userId) {
-        checkFilmIsExists(filmStorage.get(filmId), filmId);
         userStorage.get(userId)
             .orElseThrow(() -> new NotFoundException(String.format(UserErrorMessages.notFound, userId)));
     }

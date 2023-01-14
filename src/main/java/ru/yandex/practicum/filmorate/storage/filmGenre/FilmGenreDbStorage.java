@@ -96,7 +96,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
             "values ( ?, ? )";
 
         try {
-            jdbcTemplate.batchUpdate(sqlQuery, genres, 100, (PreparedStatement ps, FilmGenre genre) -> {
+            jdbcTemplate.batchUpdate(sqlQuery, genres, genres.size(), (PreparedStatement ps, FilmGenre genre) -> {
                 ps.setLong(1, filmId);
                 ps.setLong(2, genre.getId());
             });

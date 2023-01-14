@@ -7,6 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.constant.FilmErrorMessages;
+import ru.yandex.practicum.filmorate.exception.ConflictException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.Converter;
 import ru.yandex.practicum.filmorate.utils.Mapper;
@@ -38,27 +41,27 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> add(Film film) {
+    public Film add(Film film) {
         String sqlQuery = "insert into FILMS(name, description, release_date, duration, mpa_rating_id) " +
             "values (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        try {
-            jdbcTemplate.update(connection -> {
-                PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"film_id"});
-                stmt.setString(1, film.getName());
-                stmt.setString(2, film.getDescription());
-                stmt.setDate(3, Converter.convertToDateViaSqlDate(film.getReleaseDate()));
-                stmt.setInt(4, film.getDuration());
-                stmt.setLong(5, film.getMpa().getId());
-                return stmt;
-            }, keyHolder);
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"film_id"});
+            stmt.setString(1, film.getName());
+            stmt.setString(2, film.getDescription());
+            stmt.setDate(3, Converter.convertToDateViaSqlDate(film.getReleaseDate()));
+            stmt.setInt(4, film.getDuration());
+            stmt.setLong(5, film.getMpa().getId());
+            return stmt;
+        }, keyHolder);
 
-            film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
-            return Optional.of(film);
-        } catch (NullPointerException e) {
-            return Optional.empty();
+        if (Objects.isNull(keyHolder.getKey())) {
+            throw new ConflictException(FilmErrorMessages.notCreated);
         }
+
+        film.setId(keyHolder.getKey().longValue());
+        return film;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> update(Film film) {
+    public Film update(Film film) {
         String sqlQuery = "update FILMS set " +
             "NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_RATING_ID = ? " +
             "where FILM_ID = ?";
@@ -86,6 +89,10 @@ public class FilmDbStorage implements FilmStorage {
             film.getId()
         );
 
-        return status > 0 ? Optional.of(film) : Optional.empty();
+        if (status == 0) {
+            throw new NotFoundException(FilmErrorMessages.notFound);
+        }
+
+        return film;
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.constant.UserErrorMessages;
+import ru.yandex.practicum.filmorate.exception.ConflictException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotUniqueException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.Converter;
@@ -39,7 +41,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> add(User user) {
+    public User add(User user) {
         String sqlQuery = "insert into USERS(email, login, birthday, name) " +
             "values (?, ?, ?, ?)";
 
@@ -55,12 +57,14 @@ public class UserDbStorage implements UserStorage {
                 return stmt;
             }, keyHolder);
 
-            user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
-            return Optional.of(user);
+            if (Objects.isNull(keyHolder.getKey())) {
+                throw new ConflictException(UserErrorMessages.notCreated);
+            }
+
+            user.setId(keyHolder.getKey().longValue());
+            return user;
         } catch (DuplicateKeyException e) {
             throw new NotUniqueException(UserErrorMessages.notUnique);
-        } catch (NullPointerException e) {
-            return Optional.empty();
         }
     }
 
@@ -72,7 +76,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> update(User user) {
+    public User update(User user) {
         String sqlQuery = "update USERS set " +
             "EMAIL = ?, LOGIN = ?, BIRTHDAY = ?, NAME = ? " +
             "where USER_ID = ?";
@@ -85,6 +89,10 @@ public class UserDbStorage implements UserStorage {
             user.getId()
         );
 
-        return status > 0 ? Optional.of(user) : Optional.empty();
+        if (status == 0) {
+            throw new NotFoundException(UserErrorMessages.notFound);
+        }
+
+        return user;
     }
 }

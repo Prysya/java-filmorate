@@ -20,7 +20,7 @@ public interface FilmStorage {
      * @param film новый фильм
      * @return созданный фильм
      */
-    Optional<Film> add(Film film);
+    Film add(Film film);
 
     /**
      * Получение листа всех фильмов
@@ -35,5 +35,5 @@ public interface FilmStorage {
      * @param film фильм
      * @return обновленный фильм
      */
-    Optional<Film> update(Film film);
+    Film update(Film film);
 }

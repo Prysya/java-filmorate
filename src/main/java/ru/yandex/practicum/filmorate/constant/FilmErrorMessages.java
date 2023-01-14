@@ -10,4 +10,5 @@ public class FilmErrorMessages {
     public static final String duration = "Продолжительность фильма должна быть положительной";
     public static final String notFound = "Фильм c id: '%d' не найден";
     public static final String mpaIsEmpty = "Рейтинг ассоциации конокомпаний не может быть пустым";
+    public static final String notCreated = "Произошла ошибка при создании фильма";
 }

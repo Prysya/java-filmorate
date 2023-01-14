@@ -20,7 +20,7 @@ public interface UserStorage {
      * @param user новый пользователь
      * @return созданный пользователь
      */
-    Optional<User> add(User user);
+    User add(User user);
 
     /**
      * Получение листа всех пользователей
@@ -35,5 +35,5 @@ public interface UserStorage {
      * @param user пользователь
      * @return обновленный пользователь
      */
-    Optional<User> update(User user);
+    User update(User user);
 }

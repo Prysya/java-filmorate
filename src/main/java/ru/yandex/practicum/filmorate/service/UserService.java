@@ -23,35 +23,35 @@ public class UserService {
     }
 
     public User create(User user) {
-        return checkUserIsExists(userStorage.add(checkAndUpdateName(user)), user.getId());
+        return userStorage.add(checkAndUpdateName(user));
     }
 
     public User update(User user) {
-        return checkUserIsExists(userStorage.update(checkAndUpdateName(user)), user.getId());
+        return userStorage.update(checkAndUpdateName(user));
     }
 
     public User getById(Long id) {
-        return checkUserIsExists(userStorage.get(id), id);
+        return checkUserExists(userStorage.get(id), id);
 
     }
 
     public void addFriend(Long userId, Long friendId) {
-        checkUserIsExists(userStorage.get(userId), userId);
-        checkUserIsExists(userStorage.get(friendId), friendId);
+        checkUserExists(userStorage.get(userId), userId);
+        checkUserExists(userStorage.get(friendId), friendId);
 
         friendsStorage.add(userId, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        checkUserIsExists(userStorage.get(userId), userId);
-        checkUserIsExists(userStorage.get(friendId), friendId);
+        checkUserExists(userStorage.get(userId), userId);
+        checkUserExists(userStorage.get(friendId), friendId);
 
         friendsStorage.delete(userId, friendId);
     }
 
     public List<User> getMutualFriends(Long userId, Long otherId) {
-        checkUserIsExists(userStorage.get(userId), userId);
-        checkUserIsExists(userStorage.get(otherId), otherId);
+        checkUserExists(userStorage.get(userId), userId);
+        checkUserExists(userStorage.get(otherId), otherId);
 
         return friendsStorage.getMutual(userId, otherId);
     }
@@ -75,7 +75,14 @@ public class UserService {
         return user;
     }
 
-    private User checkUserIsExists(Optional<User> user, Long userId) {
+    /**
+     * Проверка наличия данных в Optional или выброс 404 ошибки
+     *
+     * @param user Опциональный {@link User}
+     * @return {@link User}
+     * @throws NotFoundException если пользователь не найден
+     */
+    private User checkUserExists(Optional<User> user, Long userId) {
         return user
             .orElseThrow(() -> new NotFoundException(String.format(UserErrorMessages.notFound, userId)));
     }
