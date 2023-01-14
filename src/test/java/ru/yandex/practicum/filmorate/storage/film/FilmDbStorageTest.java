@@ -31,7 +31,7 @@ class FilmDbStorageTest {
             .mpa(Mpa.builder().id(1L).name("G").build())
             .description("")
                 .genres(new LinkedHashSet<>())
-            .build()).get();
+            .build());
     }
 
     @Test

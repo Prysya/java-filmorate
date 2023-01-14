@@ -37,7 +37,7 @@ class UserDbStorageTest {
 
     @Test
     void shouldCreateAndFindUserInDatabase() {
-        User createdUser = userStorage.add(createBasicUser().build()).get();
+        User createdUser = userStorage.add(createBasicUser().build());
         User user = userStorage.get(
             createdUser.getId()
         ).get();
@@ -68,7 +68,7 @@ class UserDbStorageTest {
 
     @Test
     void shouldUpdateUser() {
-        User createdUser = userStorage.add(createBasicUser().build()).get();
+        User createdUser = userStorage.add(createBasicUser().build());
 
         User userForUpdate = User.builder()
             .id(createdUser.getId())
@@ -78,7 +78,7 @@ class UserDbStorageTest {
             .login("new login")
             .build();
 
-        User updatedUser = userStorage.update(userForUpdate).get();
+        User updatedUser = userStorage.update(userForUpdate);
 
         assertEquals(userForUpdate, updatedUser);
     }

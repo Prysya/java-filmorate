@@ -37,7 +37,7 @@ class LikesDbStorageTest {
                 .login("login" + i)
                 .email("test@test.ru" + i)
                 .birthday(LocalDate.of(2000, Month.DECEMBER, 1))
-                .build()).get());
+                .build()));
         }
 
         return users;
@@ -51,7 +51,7 @@ class LikesDbStorageTest {
             .mpa(Mpa.builder().id(1L).name("G").build())
             .description("")
                 .genres(new LinkedHashSet<>())
-            .build()).get();
+            .build());
     }
 
     @Test

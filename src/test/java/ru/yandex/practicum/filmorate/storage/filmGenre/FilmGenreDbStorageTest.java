@@ -33,7 +33,7 @@ class FilmGenreDbStorageTest {
             .releaseDate(LocalDate.now())
             .mpa(Mpa.builder().id(1L).build())
             .description("")
-            .build()).get();
+            .build());
     }
 
 

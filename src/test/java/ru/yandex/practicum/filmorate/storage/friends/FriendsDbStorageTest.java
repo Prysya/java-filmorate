@@ -35,7 +35,7 @@ class FriendsDbStorageTest {
                 .login("login" + i)
                 .email("test@test.ru" + i)
                 .birthday(LocalDate.of(2000, Month.DECEMBER, 1))
-                .build()).get());
+                .build()));
         }
 
         return users;
