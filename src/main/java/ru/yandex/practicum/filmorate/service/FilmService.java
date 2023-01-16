@@ -89,11 +89,6 @@ public class FilmService {
         return film;
     }
 
-    /*
-     * При отсутствии айди в бд вылезает ошибка JdbcSQLIntegrityConstraintViolationException
-     * считаю что проверку сущностей в БД в сервисе является правильным решением,
-     * так же, благодаря той проверке гараздо инормативная ошибка, чем писать общую
-     */
     private void checkFilmAndUserExists(Long filmId, Long userId) {
         filmStorage.get(filmId)
             .orElseThrow(() -> new NotFoundException(String.format(FilmErrorMessages.notFound, filmId)));
