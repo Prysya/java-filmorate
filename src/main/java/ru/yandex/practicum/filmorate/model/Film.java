@@ -1,19 +1,24 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.annotation.validator.ReleaseDateValidation;
-import ru.yandex.practicum.filmorate.constants.FilmErrorMessages;
+import ru.yandex.practicum.filmorate.constant.FilmErrorMessages;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
+@Jacksonized
+@Builder
 public class Film {
     /**
      * Константа с максимальной длинной описания
@@ -45,9 +50,15 @@ public class Film {
     /**
      * Уникальный идентификатор
      */
-    private Long id = null;
+    private Long id;
     /**
-     * Список уникальных идентификаторов пользователей которые поставили лайк
+     * Рейтинг Ассоциации кинокомпаний
      */
-    private Set<Long> likes = new HashSet<>();
+    @NotNull(message = FilmErrorMessages.mpaIsEmpty)
+    private Mpa mpa;
+    /**
+     * Жанры
+     */
+    @JsonDeserialize(as = LinkedHashSet.class)
+    private Set<FilmGenre> genres;
 }
